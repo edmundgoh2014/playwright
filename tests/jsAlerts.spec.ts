@@ -95,3 +95,21 @@ test('JSAlert_ClickBtnJSPrompt&Entered_ShowsEnteredText', async ({ page }) => {
 
   await expect(page.locator('#result')).toHaveText(`You entered:  ${enteredText}`);
 });
+
+test('JSAlert_ClickBtnJSPrompt&Cancel_ShowsNullText', async ({ page }) => {
+
+  await page.goto(jsAlertPageURL);
+
+  const dialog = await expectAlert(page, async () => {
+    await page.getByRole('button', { name: 'Click for JS Prompt' }).click(); // triggers alert
+  });
+
+  // Assert the JS alert type
+  const dialogType = dialog.type().toString();
+  await expect(dialogType).toEqual('prompt');
+
+  // Accept the alert
+  await dialog.dismiss();
+
+  await expect(page.locator('#result')).toHaveText(`You entered: null`);
+});
