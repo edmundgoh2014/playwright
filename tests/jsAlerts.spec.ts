@@ -33,6 +33,10 @@ test('JSAlert_ClickBtnJSAlert_ShowsResultSuccess', async ({ page }) => {
     await page.getByRole('button', { name: 'Click for JS Alert' }).click(); // triggers alert
   });
 
+  // Assert the JS alert type
+  const dialogType = dialog.type().toString();
+  await expect(dialogType).toEqual('alert');
+
   // Accept the alert
   await dialog.accept();
 
@@ -45,6 +49,10 @@ test('JSAlert_ClickBtnJSConfirm_ShowsResultOK', async ({ page }) => {
   const dialog = await expectAlert(page, async () => {
     await page.getByRole('button', { name: 'Click for JS Confirm' }).click(); // triggers alert
   });
+
+  // Assert the JS alert type
+  const dialogType = dialog.type().toString();
+  await expect(dialogType).toEqual('confirm');
 
   // Accept the alert
   await dialog.accept();
@@ -59,8 +67,31 @@ test('JSAlert_ClickBtnJSConfirm_ShowsResultCancel', async ({ page }) => {
     await page.getByRole('button', { name: 'Click for JS Confirm' }).click(); // triggers alert
   });
 
+  // Assert the JS alert type
+  const dialogType = dialog.type().toString();
+  await expect(dialogType).toEqual('confirm');
+
   // Accept the alert
   await dialog.dismiss();
 
   await expect(page.locator('#result')).toHaveText('You clicked: Cancel');
+});
+
+test('JSAlert_ClickBtnJSPrompt&Entered_ShowsEnteredText', async ({ page }) => {
+  const enteredText = 'No problem';
+
+  await page.goto(jsAlertPageURL);
+
+  const dialog = await expectAlert(page, async () => {
+    await page.getByRole('button', { name: 'Click for JS Prompt' }).click(); // triggers alert
+  });
+
+  // Assert the JS alert type
+  const dialogType = dialog.type().toString();
+  await expect(dialogType).toEqual('prompt');
+
+  // Accept the alert
+  await dialog.accept(enteredText);
+
+  await expect(page.locator('#result')).toHaveText(`You entered:  ${enteredText}`);
 });
