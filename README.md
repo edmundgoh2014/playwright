@@ -7,11 +7,11 @@ This repository contains **Playwright tests** demonstrating automated testing of
 ## Features
 
 - **Authentication Tests**
-  - Basic Auth and Digest Auth
+  - Basic Auth, Digest Auth & Form Auth
   - Positive (correct credentials) and negative (wrong credentials) scenarios
 
 - **JS Alert Tests**
-  - Detect and handle JS alerts and confirmation dialogs
+  - Detect and handle different JS alerts dialogs
   - Test acceptance and dismissal scenarios
   - Verify result messages after user interaction
 
