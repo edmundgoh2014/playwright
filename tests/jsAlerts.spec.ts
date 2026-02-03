@@ -1,4 +1,3 @@
-// @ts-check
 import { Page, Dialog, test, expect } from '@playwright/test';
 const jsAlertPageURL = 'https://the-internet.herokuapp.com/javascript_alerts';
 

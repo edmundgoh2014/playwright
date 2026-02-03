@@ -1,4 +1,3 @@
-// @ts-check
 import { test, expect } from '@playwright/test';
 import { CREDENTIALS } from './constants';
 const loginSuccessLocator = 'text=Congratulations! You must have the proper credentials.';
