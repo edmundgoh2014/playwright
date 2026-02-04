@@ -1,4 +1,1 @@
-export const CREDENTIALS = {
-  USERNAME: 'admin',
-  PASSWORD: 'admin',
-};
+export const testURL = 'https://the-internet.herokuapp.com/';

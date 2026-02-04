@@ -1,5 +1,8 @@
-import { Page, Dialog, test, expect } from '@playwright/test';
-const jsAlertPageURL = 'https://the-internet.herokuapp.com/javascript_alerts';
+import { type Page, type Dialog, test, expect } from '@playwright/test';
+import { alertTestData, type AlertTestCase } from '../testData/jsAlertTestData.ts';
+import { testURL } from './constants.ts';
+
+const jsAlertPageURL = `${testURL}/javascript_alerts`;
 
 /**
  * Waits for a JS alert to appear after performing an action,
@@ -25,90 +28,25 @@ async function expectAlert(page: Page, action: () => Promise<void>): Promise<Dia
   });
 };
 
-test('JSAlert_ClickBtnJSAlert_ShowsResultSuccess', async ({ page }) => {
-  await page.goto(jsAlertPageURL);
+for (const scenario of alertTestData as AlertTestCase[]) {
+  test(scenario.name, async ({ page }) => {
+    await page.goto(jsAlertPageURL);
 
-  const dialog = await expectAlert(page, async () => {
-    await page.getByRole('button', { name: 'Click for JS Alert' }).click(); // triggers alert
+    const dialog = await expectAlert(page, async () => {
+      await page.getByRole('button', { name: scenario.buttonName }).click();
+    });
+
+    // Assert type
+    expect(dialog.type()).toBe(scenario.expectedType);
+
+    // Handle Dialog
+    if (scenario.action === 'accept') {
+      await dialog.accept(scenario.inputValue);
+    } else {
+      await dialog.dismiss();
+    }
+
+    // Assert Result
+    await expect(page.locator('#result')).toHaveText(scenario.expectedResult);
   });
-
-  // Assert the JS alert type
-  const dialogType = dialog.type().toString();
-  await expect(dialogType).toEqual('alert');
-
-  // Accept the alert
-  await dialog.accept();
-
-  await expect(page.locator('#result')).toHaveText('You successfully clicked an alert');
-});
-
-test('JSAlert_ClickBtnJSConfirm_ShowsResultOK', async ({ page }) => {
-  await page.goto(jsAlertPageURL);
-
-  const dialog = await expectAlert(page, async () => {
-    await page.getByRole('button', { name: 'Click for JS Confirm' }).click(); // triggers alert
-  });
-
-  // Assert the JS alert type
-  const dialogType = dialog.type().toString();
-  await expect(dialogType).toEqual('confirm');
-
-  // Accept the alert
-  await dialog.accept();
-
-  await expect(page.locator('#result')).toHaveText('You clicked: Ok');
-});
-
-test('JSAlert_ClickBtnJSConfirm_ShowsResultCancel', async ({ page }) => {
-  await page.goto(jsAlertPageURL);
-
-  const dialog = await expectAlert(page, async () => {
-    await page.getByRole('button', { name: 'Click for JS Confirm' }).click(); // triggers alert
-  });
-
-  // Assert the JS alert type
-  const dialogType = dialog.type().toString();
-  await expect(dialogType).toEqual('confirm');
-
-  // Accept the alert
-  await dialog.dismiss();
-
-  await expect(page.locator('#result')).toHaveText('You clicked: Cancel');
-});
-
-test('JSAlert_ClickBtnJSPrompt&Entered_ShowsEnteredText', async ({ page }) => {
-  const enteredText = 'No problem';
-
-  await page.goto(jsAlertPageURL);
-
-  const dialog = await expectAlert(page, async () => {
-    await page.getByRole('button', { name: 'Click for JS Prompt' }).click(); // triggers alert
-  });
-
-  // Assert the JS alert type
-  const dialogType = dialog.type().toString();
-  await expect(dialogType).toEqual('prompt');
-
-  // Accept the alert
-  await dialog.accept(enteredText);
-
-  await expect(page.locator('#result')).toHaveText(`You entered:  ${enteredText}`);
-});
-
-test('JSAlert_ClickBtnJSPrompt&Cancel_ShowsNullText', async ({ page }) => {
-
-  await page.goto(jsAlertPageURL);
-
-  const dialog = await expectAlert(page, async () => {
-    await page.getByRole('button', { name: 'Click for JS Prompt' }).click(); // triggers alert
-  });
-
-  // Assert the JS alert type
-  const dialogType = dialog.type().toString();
-  await expect(dialogType).toEqual('prompt');
-
-  // Accept the alert
-  await dialog.dismiss();
-
-  await expect(page.locator('#result')).toHaveText(`You entered: null`);
-});
+};
